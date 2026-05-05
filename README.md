@@ -19,26 +19,21 @@
 先完全退出 Claude Desktop，然后执行：
 
 ```bash
-npx claude-code-desktop-zh-cn@latest
-```
-
-如果还没有发布到 npm，可以直接从 GitHub 执行：
-
-```bash
 npx github:SAKURA1175/claude-code-desktop-zh-cn
 ```
 
-也可以全局安装：
-
-```bash
-npm install -g claude-code-desktop-zh-cn
-claude-code-desktop-zh-cn
-```
-
-GitHub 方式全局安装：
+也可以全局安装 GitHub 版本：
 
 ```bash
 npm install -g github:SAKURA1175/claude-code-desktop-zh-cn
+claude-code-desktop-zh-cn
+```
+
+发布到 npm registry 后，也可以使用：
+
+```bash
+npx claude-code-desktop-zh-cn@latest
+npm install -g claude-code-desktop-zh-cn
 claude-code-desktop-zh-cn
 ```
 
