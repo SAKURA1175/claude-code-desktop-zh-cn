@@ -1,0 +1,41 @@
+{
+  "name": "claude-code-desktop-zh-cn",
+  "version": "0.1.0",
+  "description": "Claude Code desktop zh-CN patch for Claude Desktop on macOS.",
+  "type": "module",
+  "bin": {
+    "claude-code-desktop-zh-cn": "./scripts/patch.mjs",
+    "claude-code-desktop-zh-cn-restore": "./scripts/restore.mjs"
+  },
+  "scripts": {
+    "check": "node --check scripts/patch.mjs && node --check scripts/restore.mjs",
+    "patch": "node scripts/patch.mjs",
+    "patch:dry-run": "node scripts/patch.mjs --dry-run",
+    "report": "node scripts/patch.mjs --dry-run --report-only"
+  },
+  "keywords": [
+    "claude",
+    "claude-desktop",
+    "claude-code",
+    "zh-cn",
+    "localization",
+    "chinese"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SAKURA1175/claude-code-desktop-zh-cn.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SAKURA1175/claude-code-desktop-zh-cn/issues"
+  },
+  "homepage": "https://github.com/SAKURA1175/claude-code-desktop-zh-cn#readme",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "scripts",
+    "README.md",
+    "LICENSE"
+  ]
+}
