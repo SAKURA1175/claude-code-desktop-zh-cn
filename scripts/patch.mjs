@@ -526,6 +526,77 @@ const translations = {
   "URL": "URL"
 };
 
+const appResourceTranslations = {
+  "Claude Help": "Claude 帮助",
+  "Troubleshooting": "故障排查",
+  "Get Support": "获取支持",
+  "Show Logs in Finder": "在 Finder 中显示日志",
+  "Show Logs in Explorer": "在资源管理器中显示日志",
+  "Show Logs in File Manager": "在文件管理器中显示日志",
+  "Show Cowork Session Data in Finder": "在 Finder 中显示 Cowork 会话数据",
+  "Show Cowork Session Data in Explorer": "在资源管理器中显示 Cowork 会话数据",
+  "Show Cowork Session Data in File Manager": "在文件管理器中显示 Cowork 会话数据",
+  "Copy Installation ID": "复制安装 ID",
+  "Generate Diagnostic Report": "生成诊断报告",
+  "Record Net Log (30s)": "记录网络日志（30 秒）",
+  "Disable Hardware Acceleration": "禁用硬件加速",
+  "Enable Cowork VM Debug Logging": "启用 Cowork VM 调试日志",
+  "Enable Cowork SDK Debugging": "启用 Cowork SDK 调试",
+  "Delete Cowork VM Bundle and Restart…": "删除 Cowork VM Bundle 并重新启动…",
+  "Delete Cowork VM Sessions and Restart…": "删除 Cowork VM 会话并重新启动…",
+  "Delete VM Sessions and Restart": "删除 VM 会话并重新启动",
+  "Delete VM Bundle and Restart": "删除 VM Bundle 并重新启动",
+  "Clear Cache and Restart": "清除缓存并重新启动",
+  "Reset App Data…": "重置应用数据…",
+  "Reset Application Data": "重置应用数据",
+  "Configure Third-Party Inference…": "配置第三方推理…",
+  "File": "文件",
+  "Edit": "编辑",
+  "View": "视图",
+  "Developer": "开发者",
+  "Window": "窗口",
+  "Help": "帮助",
+  "About Claude": "关于 Claude",
+  "Settings…": "设置…",
+  "Settings...": "设置...",
+  "Open Link in Browser": "在浏览器中打开链接",
+  "Open File…": "打开文件…",
+  "Open Documentation": "打开文档",
+  "Open App Config File...": "打开应用配置文件...",
+  "Open Developer Config File...": "打开开发者配置文件...",
+  "Open MCP Log File...": "打开 MCP 日志文件...",
+  "Show Dev Tools": "显示开发者工具",
+  "Show All Dev Tools": "显示全部开发者工具",
+  "Inspect Element": "检查元素",
+  "Reload This Page": "重新加载此页面",
+  "Actual Size": "实际大小",
+  "Zoom In": "放大",
+  "Zoom Out": "缩小",
+  "Select All": "全选",
+  "Find": "查找",
+  "Cut": "剪切",
+  "Copy": "复制",
+  "Paste": "粘贴",
+  "Undo": "撤销",
+  "Redo": "重做",
+  "Close": "关闭",
+  "Close Window": "关闭窗口",
+  "Quit": "退出",
+  "Exit": "退出",
+  "Back": "后退",
+  "Forward": "前进",
+  "Refresh": "刷新",
+  "Preview": "预览",
+  "Open": "打开",
+  "Create": "创建",
+  "Save": "保存",
+  "Cancel": "取消",
+  "Restart Now": "立即重启",
+  "Restart Required": "需要重启",
+  "The application must be restarted for this change to take effect.": "必须重新启动应用，此更改才会生效。",
+  "The application will now restart.": "应用现在将重新启动。"
+};
+
 const thirdPartyInferenceBundleKeys = [
   "Configure third-party inference",
   "Search settings",
@@ -856,6 +927,28 @@ function patchCatalog(enPath, localePath, stamp, dryRun) {
   return result;
 }
 
+function patchJsonValues(file, map, stamp, dryRun) {
+  if (!fs.existsSync(file)) throw new Error(`Missing JSON file: ${file}`);
+
+  const source = readJson(file);
+  let changed = 0;
+
+  for (const [key, value] of Object.entries(source)) {
+    const translated = map[value];
+    if (typeof translated === "string" && translated !== value) {
+      source[key] = translated;
+      changed += 1;
+    }
+  }
+
+  const result = { file, changed };
+  if (changed > 0) {
+    result.backup = backup(file, stamp, dryRun);
+    writeJson(file, source, dryRun);
+  }
+  return result;
+}
+
 function replaceAll(source, from, to) {
   return source.split(from).join(to);
 }
@@ -962,6 +1055,9 @@ function main() {
     stamp,
     options.dryRun || options.reportOnly
   );
+  const appResources = options.reportOnly
+    ? { skipped: true, reason: "report-only", file: path.join(resourcesDir, "en-US.json") }
+    : patchJsonValues(path.join(resourcesDir, "en-US.json"), appResourceTranslations, stamp, options.dryRun);
 
   const result = {
     dryRun: options.dryRun,
@@ -969,6 +1065,7 @@ function main() {
     app: options.app,
     locale: options.locale,
     dictionaryEntries: Object.keys(translations).length,
+    appResources,
     catalog: trimSamples(catalog, options.maxReport),
     statsigCatalog: trimSamples(statsigCatalog, options.maxReport),
     bundles: options.reportOnly
